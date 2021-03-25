@@ -41,3 +41,6 @@ Content-Type: application/json
     "name": "No number",
     "number": ""
 }
+
+###
+GET https://phonebook-backend-server.herokuapp.com/api/persons
