@@ -39,7 +39,9 @@ app.get('/api/info', (request, response) => {
 const Info = () => {
   return('<p>Phonebook has info for ' 
   + persons.length + 
-  ' people</p><p>DATE</p>')
+  ' people</p>' + '<p>' + 
+  String(new Date()) + 
+  '</p>')
 }
 
 const PORT = 3001
