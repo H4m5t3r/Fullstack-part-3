@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "rm -rf build && cd ../Fullstack-2021/part2/phonebook/ && npm run build --prod && cp -r build cd ../../../part3/",
+    "build:ui": "rm -rf build && cd ../Fullstack-2021/part2/phonebook/ && npm run build --prod && cp -r build ../../../part3/",
     "deploy": "git push heroku main",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
     "logs:prod": "heroku logs --tail"
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/H4m5t3r/Fullstack-part-3#readme",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongoose": "^5.12.2",
     "morgan": "^1.10.0"

@@ -1,5 +1,7 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
+const Person = require('./models/person')
 
 app.use(express.json())
 
@@ -11,30 +13,6 @@ const cors = require('cors')
 app.use(cors())
 
 app.use(express.static('build'))
-
-const mongoose = require('mongoose')
-// The MongoDB password is given as the last argument
-// when starting the application
-const password = process.argv[process.argv.length - 1]
-const url =
-  `mongodb+srv://fullstack:${password}@cluster0.niuy1.mongodb.net/persons?retryWrites=true&w=majority`
-
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
-
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-})
-
-personSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
-})
-
-const Person = mongoose.model('Person', personSchema)
 
 let persons = [
   {
@@ -90,6 +68,8 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
+  /*Needs to be removed/fixed but was just commented for now 
+  in case it becomes useful later*/
   if (!body.name) {
     return response.status(400).json({ 
       error: 'name is missing' 
@@ -98,21 +78,22 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({ 
       error: 'number is missing' 
     })
-  } else if (nameAlreadyExists(body.name)) {
-    return response.status(400).json({ 
-      error: 'name must be unique' 
-    })
   }
+  // else if (nameAlreadyExists(body.name)) {
+  //   return response.status(400).json({ 
+  //     error: 'name must be unique' 
+  //   })
+  // }
 
-  const person = {
-    id: generateId(),
+  const person = new Person({
+    // id: generateId(),
     name: body.name,
-    number: body.number
-  }
+    number: body.number,
+  })
 
-  persons = persons.concat(person)
-
-  response.json(person)
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
 })
 
 const nameAlreadyExists = (name) => {
@@ -135,7 +116,7 @@ const Info = () => {
   '</p>')
 }
 
-const PORT = process.env.PORT || 3001
-app.listen(PORT, () => {
+const PORT = process.env.PORT
+  app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
