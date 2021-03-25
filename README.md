@@ -1,6 +1,7 @@
 #Fullstack 2021 part 3
 
-Online application with database:
+Online application:
 https://phonebook-backend-server.herokuapp.com/api/persons
 
-Test change to make the Heroku app refresh
+Deployed online frontend application:
+https://glacial-sierra-45342.herokuapp.com/
