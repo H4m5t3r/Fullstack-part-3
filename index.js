@@ -1,18 +1,36 @@
-require('dotenv').config()
 const express = require('express')
 const app = express()
+const cors = require('cors')
+require('dotenv').config()
 const Person = require('./models/person')
 
+app.use(express.static('build'))
+app.use(cors())
 app.use(express.json())
 
 const morgan = require('morgan')
 morgan.token('body', (req, res) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-const cors = require('cors')
-app.use(cors())
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
 
-app.use(express.static('build'))
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+const requestLogger = (request, response, next) => {
+  console.log('Method:', request.method)
+  console.log('Path:  ', request.path)
+  console.log('Body:  ', request.body)
+  console.log('---')
+  next()
+}
+
+app.use(requestLogger)
 
 let persons = [
   {
@@ -47,15 +65,16 @@ app.get('/api/info', (request, response) => {
   response.send(Info(persons))
 })
 
-app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
-  
-  if (person) {
-    response.json(person)
-  } else {
-    response.status(404).end()
-  }
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
+  .then(person => {
+    if (person) {
+      response.json(person)
+    } else {
+      response.status(404).end()
+    }
+  })
+  .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -87,13 +106,10 @@ app.post('/api/persons', (request, response) => {
   // }
 
   const person = new Person({
-    // id: generateId(),
+    id: generateId(),
     name: body.name,
     number: body.number,
   })
-
-  person.id = person._id.toString()
-  console.log(person)
 
   person.save().then(savedPerson => {
     response.json(savedPerson)
@@ -119,6 +135,14 @@ const Info = () => {
   String(new Date()) + 
   '</p>')
 }
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
   app.listen(PORT, () => {
