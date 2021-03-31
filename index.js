@@ -91,6 +91,9 @@ app.post('/api/persons', (request, response) => {
     number: body.number,
   })
 
+  person.id = person._id.toString()
+  console.log(person)
+
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
@@ -105,7 +108,7 @@ const nameAlreadyExists = (name) => {
 }
 
 const generateId = () => {
-  return Math.floor(Math.random() * Math.floor(1000000))
+  return Math.floor(Math.random() * Math.floor(1000000)).toString()
 }
 
 const Info = () => {
