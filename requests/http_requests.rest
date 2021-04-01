@@ -47,3 +47,21 @@ GET https://phonebook-backend-server.herokuapp.com/api/persons
 
 ###
 GET http://localhost:3001/api/notes/5c41c90e84d891c15dfa3431
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Arto Hellas",
+    "number": "5732098"
+}
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Arto Hollas",
+    "number": "5732097"
+}
